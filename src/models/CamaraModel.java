@@ -1,10 +1,20 @@
 package models;
 
+import static com.jogamp.opengl.GL.GL_FRONT;
+import com.jogamp.opengl.GL2;
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT;
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_DIFFUSE;
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_EMISSION;
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_SHININESS;
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
+import com.jogamp.opengl.util.gl2.GLUT;
+import java.awt.Color;
+
 /**
  *
  * @author Honorio Acosta Ruiz
  */
-public final class CamaraModel extends Object3D {
+public final class CamaraModel extends Object3D implements IDrawable {
 
 	private Float fovy;
 	private Float aspect;
@@ -180,7 +190,26 @@ public final class CamaraModel extends Object3D {
 		return this.pointing.getPosition();
 	}
 
-	public float[] getLooktingPosition() {
+	public float[] getLookingPosition() {
 		return this.looking.getPosition();
+	}
+
+	@Override
+	public void draw(GL2 gl, GLUT glut) {
+
+		gl.glPushMatrix();
+		{
+			gl.glMaterialfv(GL_FRONT, GL_AMBIENT, ColorConverter.convertToFME(Color.BLACK), 0);
+			gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, ColorConverter.convertToFME(Color.BLACK), 0);
+			gl.glMaterialfv(GL_FRONT, GL_SPECULAR, ColorConverter.convertToFME(Color.BLACK), 0);
+			gl.glMateriali(GL_FRONT, GL_SHININESS, 0);
+			gl.glMaterialfv(GL_FRONT, GL_EMISSION, ColorConverter.convertToFME(Color.BLACK), 0);
+
+			gl.glTranslatef(pointing.x, pointing.y, pointing.z);
+			gl.glLineWidth(5);
+			glut.glutSolidSphere(0.09f, 20, 20);
+		}
+		gl.glPopMatrix();
+
 	}
 }

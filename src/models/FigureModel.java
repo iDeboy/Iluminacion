@@ -3,14 +3,20 @@ package models;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
  * @author Honorio Acosta Ruiz
  */
-public abstract class FigureModel extends Object3D {
+public abstract class FigureModel extends Object3D implements IDrawable {
 
-	// Light properties
+	private static final ArrayList<Integer> ids = new ArrayList<>();
+
+	private int id;
+
+// Light properties
 	protected boolean isLight;
 	protected GlLight light;
 
@@ -24,9 +30,15 @@ public abstract class FigureModel extends Object3D {
 	protected int shininess;
 	protected Color emissionColor;
 
+	public FigureModel() {
+		this("Figure", 0, 0, 0, 1, Color.RED, Color.DARK_GRAY, Color.DARK_GRAY, Color.DARK_GRAY, 4, Color.BLACK);
+	}
+
 	public FigureModel(String name, float x, float y, float z, float h,
 					Color strokeColor, Color ambientColor, Color difuseColor, Color specularColor, int shininess, Color emissionColor) {
 		super(name, x, y, z, h);
+
+		this.id = generateId();
 
 		this.selected = false;
 		this.isLight = false;
@@ -50,6 +62,8 @@ public abstract class FigureModel extends Object3D {
 					Color strokeColor, Color ambientColor, Color difuseColor, Color specularColor, int shininess, Color emissionColor) {
 		super(name, x, y, z);
 
+		this.id = generateId();
+
 		this.selected = false;
 		this.isLight = false;
 		this.light = GlLight.None;
@@ -72,6 +86,7 @@ public abstract class FigureModel extends Object3D {
 		return this.isLight;
 	}
 
+	@Override
 	public void draw(GL2 gl, GLUT glut) {
 
 		// Diseable unused lights & enable used lights
@@ -89,7 +104,7 @@ public abstract class FigureModel extends Object3D {
 
 		// Configure figure light if has any
 		if (this.isLight()) {
-			
+
 			gl.glLightfv(light.getValue(), GL2.GL_DIFFUSE, ColorConverter.convertToFME(difuseColor), 0);
 			gl.glLightfv(light.getValue(), GL2.GL_SPECULAR, ColorConverter.convertToFME(specularColor), 0);
 			gl.glLightfv(light.getValue(), GL2.GL_POSITION, getPosition(), 0);
@@ -174,4 +189,20 @@ public abstract class FigureModel extends Object3D {
 		this.emissionColor = emissionColor;
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	private static int generateId() {
+
+		int id = new Random().nextInt(1, Integer.MAX_VALUE);
+
+		while (ids.contains(id)) {
+			id = new Random().nextInt(1, Integer.MAX_VALUE);
+		}
+
+		ids.add(id);
+
+		return id;
+	}
 }

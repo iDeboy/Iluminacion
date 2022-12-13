@@ -76,6 +76,12 @@ public abstract class Object3D {
 		translateY(y);
 		translateZ(z);
 	}
+	
+	public void translate(float[] coords) {
+		translateX(coords[0]);
+		translateY(coords[1]);
+		translateZ(coords[2]);
+	}
 
 	public float[] getPosition() {
 		return new float[]{x, y, z};
@@ -83,7 +89,7 @@ public abstract class Object3D {
 
 	@Override
 	public String toString() {
-		return "(" + x + ", " + y + ", " + z + ")";
+		return name + "(" + x + ", " + y + ", " + z + ")";
 	}
 
 }

@@ -12,6 +12,11 @@ import java.awt.Color;
  */
 public class SphereModel extends FigureModel {
 
+	public SphereModel() {
+		super();
+		this.name = "Sphere";
+	}
+
 	public SphereModel(float x, float y, float z, float h, Color strokeColor, Color ambientColor, Color difuseColor, Color specularColor, int shininess, Color emissionColor) {
 		super("Sphere", x, y, z, h, strokeColor, ambientColor, difuseColor, specularColor, shininess, emissionColor);
 	}
