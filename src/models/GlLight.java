@@ -16,6 +16,17 @@ public final class GlLight {
 		this.used = false;
 	}
 
+	public static GlLight next() {
+
+		for (var l : values()) {
+			if (!l.used) {
+				return l;
+			}
+		}
+
+		return None;
+	}
+
 	public static GlLight[] values() {
 
 		return new GlLight[]{

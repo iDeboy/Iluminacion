@@ -22,6 +22,8 @@ public abstract class FigureModel extends Object3D implements IDrawable {
 
 	// Figure properties
 	protected boolean selected;
+	private int auxShininess;
+	private int shininessLight;
 
 	protected Color strokeColor;
 	protected Color ambientColor;
@@ -50,6 +52,9 @@ public abstract class FigureModel extends Object3D implements IDrawable {
 		this.specularColor = specularColor;
 		this.shininess = shininess;
 		this.emissionColor = emissionColor;
+
+		this.shininessLight = this.shininess + 100;
+		this.auxShininess = this.shininess;
 	}
 
 	public FigureModel(String name, float x, float y, float z, float h,
@@ -74,6 +79,9 @@ public abstract class FigureModel extends Object3D implements IDrawable {
 		this.specularColor = specularColor;
 		this.shininess = shininess;
 		this.emissionColor = emissionColor;
+
+		this.shininessLight = this.shininess + 100;
+		this.auxShininess = this.shininess;
 	}
 
 	public FigureModel(String name, float x, float y, float z,
@@ -105,12 +113,37 @@ public abstract class FigureModel extends Object3D implements IDrawable {
 		// Configure figure light if has any
 		if (this.isLight()) {
 
+			this.shininess = this.shininessLight;
+
 			gl.glLightfv(light.getValue(), GL2.GL_DIFFUSE, ColorConverter.convertToFME(difuseColor), 0);
 			gl.glLightfv(light.getValue(), GL2.GL_SPECULAR, ColorConverter.convertToFME(specularColor), 0);
 			gl.glLightfv(light.getValue(), GL2.GL_POSITION, getPosition(), 0);
 
+		} else {
+			this.shininess = this.auxShininess;
 		}
 
+	}
+
+	public boolean convertLight() {
+
+		GlLight aux = GlLight.next();
+
+		System.out.println(aux);
+
+		setLight(aux.getValue());
+
+		return isLight;
+	}
+
+	public boolean unconvertLight() {
+
+		if (light.equals(GlLight.None)) {
+			return false;
+		}
+
+		setLight(GlLight.None.getValue());
+		return true;
 	}
 
 	public void setLight(int light) {
@@ -179,6 +212,7 @@ public abstract class FigureModel extends Object3D implements IDrawable {
 
 	public void setShininess(int shininess) {
 		this.shininess = shininess;
+		this.auxShininess = this.shininess;
 	}
 
 	public Color getEmissionColor() {

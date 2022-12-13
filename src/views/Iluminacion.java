@@ -3,35 +3,23 @@ package views;
 import com.jogamp.opengl.util.FPSAnimator;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import static java.awt.event.KeyEvent.VK_A;
-import static java.awt.event.KeyEvent.VK_D;
-import static java.awt.event.KeyEvent.VK_DOWN;
-import static java.awt.event.KeyEvent.VK_E;
-import static java.awt.event.KeyEvent.VK_Q;
-import static java.awt.event.KeyEvent.VK_S;
-import static java.awt.event.KeyEvent.VK_UP;
-import static java.awt.event.KeyEvent.VK_W;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import static java.awt.event.KeyEvent.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -68,17 +56,6 @@ public class Iluminacion extends JFrame implements Runnable, WindowListener {
 		initComponents();
 	}
 
-	private Constructor getDefaultContructor(Object obj) {
-
-		for (var cont : currentFigure.getClass().getConstructors()) {
-			if (cont.getParameterCount() == 0) {
-				return cont;
-			}
-		}
-
-		return null;
-	}
-
 	private void initComponents() {
 
 		camara = new CamaraModel(2, 2, 8, 45, 0, 0.1f, 20, 0, 0, 0, 0, 1, 0);
@@ -94,6 +71,7 @@ public class Iluminacion extends JFrame implements Runnable, WindowListener {
 		btnDodecahedro = new JButton();
 		btnIcosahedro = new JButton();
 		btnOctahedro = new JButton();
+		btnAyuda = new JButton();
 
 		canvasPanel = new PanelIluminacion(camara);
 		animator = new FPSAnimator(canvasPanel, PanelIluminacion.FPS, true);
@@ -211,6 +189,31 @@ public class Iluminacion extends JFrame implements Runnable, WindowListener {
 						case VK_E -> {
 							selectedModel.addZ(-0.05f);
 						}
+						case VK_C -> {
+							var figureColor = JColorChooser.showDialog(null, "Color de la figura", selectedModel.getAmbientColor());
+
+							if (figureColor == null) {
+								return;
+							}
+
+							selectedModel.setAmbientColor(figureColor);
+							selectedModel.setDifuseColor(figureColor);
+							selectedModel.setEmissionColor(figureColor);
+							selectedModel.setSpecularColor(figureColor);
+						}
+						case VK_L -> {
+							if (selectedModel.isLight()) {
+								if (selectedModel.unconvertLight()) {
+									logger.append("La figura " + selectedModel.getName() + " ya no es luz.\n");
+								}
+							} else {
+								if (!selectedModel.convertLight()) {
+									logger.append("La figura " + selectedModel.getName() + " no se pudo convertir en luz.\n");
+								} else {
+									logger.append("La figura " + selectedModel.getName() + " ahora es luz.\n");
+								}
+							}
+						}
 					}
 				}
 
@@ -320,11 +323,35 @@ public class Iluminacion extends JFrame implements Runnable, WindowListener {
 
 		});
 
+		btnAyuda.setText("Ayuda");
+		btnAyuda.setFont(new Font("Montserrat", Font.BOLD, 16));
+		btnAyuda.addActionListener((ActionEvent e) -> {
+
+			logger.append("Se va a abierto en menu de ayuda.\n");
+
+			String message = "Uso: \n";
+			message += " Al dar clic a algun boton de figura, esta se creara,\n";
+			message += " encima de la esfera que se muestra.\n";
+			message += " Nota: Esa esfera representa donde apunta la vision de la camara.\n";
+			
+			message += "Controles:\n";
+			message += " - Shift + (W,A,S,D,Q,E): Cambian la posición de la camara.\n";
+			message += " - Ctrl + (W,A,S,D,Q,E): Cambian el punto que ve la camara.\n";
+			message += " - Ctrl + (↑, ↓): Cambian la distancia de visión de la camara.\n";
+			message += " - W,A,S,D,Q,E: Cambian la posición de la figura seleccionada.\n";
+			message += " - C: Cambia el color de la figura seleccionada.\n";
+			message += " - L: Habilita/deshabilita la luz en la figura seleccionada.\n";
+
+			JOptionPane.showMessageDialog(this, message, "Ayuda", JOptionPane.INFORMATION_MESSAGE);
+
+		});
+
 		buttonGroup.add(btnEsfera);
 		buttonGroup.add(btnCubo);
 		buttonGroup.add(btnDodecahedro);
 		buttonGroup.add(btnIcosahedro);
 		buttonGroup.add(btnOctahedro);
+		buttonGroup.add(btnAyuda);
 
 		leftPanel.add(leftPanelTitle);
 		leftPanel.add(btnEsfera);
@@ -332,6 +359,7 @@ public class Iluminacion extends JFrame implements Runnable, WindowListener {
 		leftPanel.add(btnDodecahedro);
 		leftPanel.add(btnIcosahedro);
 		leftPanel.add(btnOctahedro);
+		leftPanel.add(btnAyuda);
 
 		/* centerPanel components & design */
 		centerPanel.setLayout(new BorderLayout());
@@ -444,6 +472,7 @@ public class Iluminacion extends JFrame implements Runnable, WindowListener {
 	private JButton btnDodecahedro;
 	private JButton btnIcosahedro;
 	private JButton btnOctahedro;
+	private JButton btnAyuda;
 
 	/* centerPanel components */
 	private PanelIluminacion canvasPanel;

@@ -136,7 +136,7 @@ public class PanelIluminacion extends GLJPanel implements GLEventListener {
 
 		gl.glMatrixMode(GL_PROJECTION);			// choose projection matrix
 		gl.glLoadIdentity();
-
+		
 		glu.gluPerspective(camara.getFov(), camara.getAspect(),
 						camara.getNear(), camara.getFar());
 
